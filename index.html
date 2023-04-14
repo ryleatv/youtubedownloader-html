@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Télécharger vidéo Youtube</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Download YouTube Video</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Télécharger une vidéo Youtube</h1>
-      <form id="form">
-        <input type="text" id="urlInput" placeholder="Entrez le lien de la vidéo">
-        <button type="submit" id="submitBtn">Télécharger</button>
-      </form>
-      <div id="error"></div>
-      <div id="loading"></div>
-      <div id="success"></div>
-    </div>
+    <input type="text" id="url" placeholder="Enter YouTube Video URL">
+    <button id="downloadBtn">Download</button>
 
-    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      downloadBtn.addEventListener('click', () => {
+        const url = document.getElementById('url').value;
+        if (!url) {
+          alert('Please enter a YouTube video URL');
+          return;
+        }
+
+        const videoId = url.match(/[?&]v=([^&]+)/)[1];
+        const downloadUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+        fetch(`https://cors-anywhere.herokuapp.com/${downloadUrl}`)
+          .then(response => response.text())
+          .then(data => {
+            const regex = /"url_encoded_fmt_stream_map":\s*"([^"]+)"/;
+            const match = regex.exec(data);
+            if (match) {
+              const urlEncodedFmtStreamMap = match[1];
+              const streams = urlEncodedFmtStreamMap.split(',');
+              const video = streams.find(stream => stream.includes('video/mp4'));
+              const audio = streams.find(stream => stream.includes('audio/mp4'));
+              const videoUrl = decodeURIComponent(video.split('url=')[1]);
+              const audioUrl = decodeURIComponent(audio.split('url=')[1]);
+              const title = document.title.replace(/\s/g, '_');
+
+              fetch(videoUrl)
+                .then(response => response.blob())
+                .then(videoBlob => {
+                  fetch(audioUrl)
+                    .then(response => response.blob())
+                    .then(audioBlob => {
+                      const combinedBlob = new Blob([videoBlob, audioBlob], { type: 'video/mp4' });
+                      saveAs(combinedBlob, `${title}.mp4`);
+                    });
+                });
+            } else {
+              alert('Failed to get video download URL');
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            alert('Failed to download video');
+          });
+      });
+    </script>
   </body>
 </html>
