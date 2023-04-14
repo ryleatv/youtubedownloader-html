@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>YouTube Downloader</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Télécharger une vidéo YouTube</title>
 </head>
 <body>
-  <header>
-    <h1>YouTube Downloader</h1>
-  </header>
-  <main>
-    <form id="youtube-form">
-      <label for="url-input">Enter YouTube video URL:</label>
-      <input type="text" id="url-input" name="url" required>
-      <button type="submit" id="download-btn">Download</button>
-    </form>
-  </main>
-  <script src="script.js"></script>
+  <h1>Télécharger une vidéo YouTube</h1>
+  <input type="text" id="urlInput" placeholder="URL de la vidéo">
+  <button onclick="downloadVideo()">Télécharger</button>
+  <script>
+    function downloadVideo() {
+      var urlInput = document.getElementById("urlInput");
+      var videoUrl = urlInput.value;
+      var a = document.createElement('a');
+      a.href = 'https://www.youtubeinmp4.com/redirect.php?video=' + videoUrl;
+      a.download = videoUrl + '.mp4';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
 </body>
 </html>
