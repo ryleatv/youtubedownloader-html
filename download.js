@@ -1,24 +1,23 @@
-const downloadVideo = (url) => {
-  fetch(`https://your-video-downloader-api.com/download?url=${url}`)
-    .then(response => response.blob())
-    .then(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'video.mp4';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-    })
-    .catch((error) => {
-      console.error('Error downloading video:', error);
-    });
+function downloadVideo() {
+  var url = document.getElementById("url").value;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/download?video_url=' + encodeURIComponent(url), true);
+  xhr.responseType = 'blob';
+  xhr.onload = function() {
+    if (this.status === 200) {
+      var blob = new Blob([this.response], {type: 'video/mp4'});
+      var link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'video.mp4';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error('Error:', this.statusText);
+    }
+  };
+  xhr.onerror = function() {
+    console.error('Error:', this.statusText);
+  };
+  xhr.send();
 }
-
-const form = document.querySelector('form');
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const url = document.querySelector('#url').value;
-  downloadVideo(url);
-});
