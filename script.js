@@ -1,17 +1,14 @@
-function download() {
-  const url = document.getElementById("urlInput").value;
-  const spawn = require('child_process').spawn;
-  const youtubeDL = spawn('youtube-dl', [url]);
+<script>
+    function downloadMp4() {
+        var link = document.getElementById("link").value;
+        var a = document.createElement("a");
+        a.href = "http://youtubeinmp4.com/redirect.php?video=" + link;
+        a.download = "video.mp4";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
 
-  youtubeDL.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  youtubeDL.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-  });
-
-  youtubeDL.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
-}
+<input type="text" id="link" placeholder="Enter YouTube video URL here">
+<button onclick="downloadMp4()">Download</button>
